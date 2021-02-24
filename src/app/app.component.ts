@@ -53,25 +53,46 @@ function classDecorator(): any {
 }
 
 @classDecorator()
-export class Member extends Serializable {
-  static clientType = "memberClientType";
-  id: number;
-  getToto() {
-    return "toto";
-  }
+export class PizzaOrder extends Serializable {
+  static clientType = "pizzaorder";
+  sizes: Size[] = [];
+  tops: Topping[] = [];
+  offers: Offer[] = [];
 }
 
 @classDecorator()
-export class ExampleClass extends Serializable {
-  static clientType = "exampleClassClientType";
-  mainId: number;
-  firstMember: Member;
-  secondMember: Member;
-  thirdMember: Member[] = [];
-  randomMember: { [index: string]: Member } = {};
-  myMethod() {
-    return "method";
-  }
+export class Size extends Serializable {
+  static clientType = "size";
+  name: string;
+  price: string;
+}
+
+@classDecorator()
+export class Topping extends Serializable {
+  static clientType = "tops";
+  vetops: VegOptions[] = [];
+  nonvegtops: NonVegoptions[] = [];
+}
+
+@classDecorator()
+export class VegOptions extends Serializable {
+  static clientType = "vegtop";
+  name: string;
+  price: string;
+}
+
+@classDecorator()
+export class NonVegoptions extends Serializable {
+  static clientType = "nonvegtop";
+  name: string;
+  price: string;
+}
+
+@classDecorator()
+export class Offer extends Serializable {
+  static clientType = "promotional";
+  name: string;
+  price: string;
 }
 
 @Component({
@@ -80,32 +101,54 @@ export class ExampleClass extends Serializable {
   styleUrls: ["./app.component.css"]
 })
 export class AppComponent implements OnInit {
+  public msg: string;
   ngOnInit() {
-    console.log(ClassResolver.TypeDictionary);
-
     const json = {
-      clientType: "exampleClassClientType",
-      mainId: 42,
-      firstMember: {
-        clientType: "memberClientType",
-        id: 1337
-      },
-      secondMember: {
-        clientType: "memberClientType",
-        IDs: -1
-      },
-      thirdMember: [
-        { clientType: "memberClientType", id: 1 },
-        { clientType: "memberClientType", id: 2 }
+      clientType: "pizzaorder",
+      sizes: [
+        { clientType: "size", name: "Small", price: "$5" },
+        { clientType: "size", name: "Medium", price: "$7" },
+        { clientType: "size", name: "Large", price: "$8" },
+        { clientType: "size", name: "ExtraLarge", price: "$9" }
       ],
-      randomMember: {
-        toto: { clientType: "memberClientType", id: 1 },
-        tata: { clientType: "memberClientType", id: 2 }
-      }
+      tops: {
+        clientType: "tops",
+        VegOptions: [
+          { clientType: "vegtop", name: "Tomatoes", price: "$1.00" },
+          { clientType: "vegtop", name: "Onions", price: "$0.50" },
+          { clientType: "vegtop", name: "Bellpepper", price: "$1.00" },
+          { clientType: "vegtop", name: "Mushrooms", price: "$1.20" },
+          { clientType: "vegtop", name: "Pineapple", price: "$0.75" }
+        ],
+        NonVegoptions: [
+          { clientType: "nonvegtop", name: "Sausage", price: "$1.00" },
+          { clientType: "nonvegtop", name: "Pepperoni", price: "$2.00" },
+          { clientType: "nonvegtop", name: "Barbecuechicken", price: "$3.00" }
+        ]
+      },
+      offers: [
+        {
+          clientType: "promotional",
+          name: "1 Medium Pizza with 2 toppings",
+          price: "$5"
+        },
+        {
+          clientType: "promotional",
+          name: "2 Medium Pizza with 4 topping each",
+          price: "$9"
+        },
+        {
+          clientType: "promotional",
+          name:
+            "1 Large with 4 toppings (Peperoni and Barbecue chicken are counted as 2 toppings)",
+          price: "-50%"
+        }
+      ]
     };
 
-    const instance = ClassResolver.ResolveObject(json) as ExampleClass;
+    const instance = ClassResolver.ResolveObject(json) as PizzaOrder;
     console.log(instance);
-    console.log(instance.thirdMember[0].getToto());
+    this.msg = instance.sizes[0].name;
+    //console.log(instance.sizes[0]);
   }
 }
